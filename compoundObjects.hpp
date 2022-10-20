@@ -22,10 +22,10 @@ public:
 
 	compoundObjects(CGRAobject& CGRAobject);
 	~compoundObjects();
-	void PushChild(CGRAobject * Child);
-
+	void PushChild(compoundObjects * Child);
+	void DrawTree(glm::mat4 V, glm::mat4 P);
 	CGRAobject *Object;
 	glm::mat4 TransformFromMother;
-	std::vector<CGRAobject *> Children;
+	std::vector<compoundObjects *> Children;
 //	std::string name;
 };

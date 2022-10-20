@@ -26,7 +26,6 @@ glm::mat4 Camera::GetViewMatrix() {
     m_Position += m_Front * 0.001;
   }*/
 
-void Camera::UpdateCameraVectors() {}
 
 /*void processInput(GLFWwindow *window)
 {

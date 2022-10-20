@@ -1,4 +1,5 @@
 #include "Camera.cpp"
+#include "compoundObjects.cpp"
 #include "compoundObjects.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -57,13 +58,13 @@
 
 #define GLEW_STATIC
 
-Camera camera(glm::vec3(0.0f, 2.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
+Camera camera(glm::vec3(0.0f, 2.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f,
               0.0f);
 
 DEECShader *basicShader;
 GLFWwindow *window;
 bool wire = false;
-float lastX = 400, lastY = 300, yaw = -90.0f, pitch = 0.0f;
+//float lastX = 400, lastY = 300, yaw = -90.0f, pitch = 0.0f;
 float deltaTime = 0.0f, lastFrame = 0.0f;
 bool firstMouse = true;
 float cameraSpeed = 1.0f;
@@ -88,7 +89,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action,
   }
 }
 
-void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
+/*void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   if (firstMouse) {
     lastX = xpos;
     lastY = ypos;
@@ -119,7 +120,7 @@ void mouse_callback(GLFWwindow *window, double xpos, double ypos) {
   camera.m_Front = glm::normalize(direction);
   camera.m_Right =
       glm::normalize(glm::cross(camera.m_Front, glm::vec3(0.0f, 1.0f, 0.0f)));
-}
+}*/
 
 int main(int argc, char const *argv[]) {
 
@@ -144,7 +145,7 @@ int main(int argc, char const *argv[]) {
   glfwSetKeyCallback(window, KeyCallback);
 
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  glfwSetCursorPosCallback(window, mouse_callback);
+//  glfwSetCursorPosCallback(window, mouse_callback);
 
   if (glewInit() != GLEW_OK) {
     std::cout << "Error initializing GLEW.\n";
@@ -174,26 +175,39 @@ int main(int argc, char const *argv[]) {
   glEnable(GL_DEPTH_TEST);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glClearColor(0.53f, 0.8f, 0.92f, 1.0f);
+
   glm::mat4 proj = glm::perspective(glm::radians(80.0f), 1.0f, 0.5f, 50.0f);
+
   CGRASquare chao;
-  CGRACube cubo;
+  CGRACube carroCorpo;
   CGRASphere sol;
   CGRACylinder pneu;
+  CGRACylinder carroPneu;
   CGRACone cone;
+  compoundObjects carroObj(carroCorpo);
+  compoundObjects carroPneuObj(pneu);
+  
+  
+
+
   std::vector<glm::vec3> revoPontos;
   revoPontos.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
   revoPontos.emplace_back(glm::vec3(0.7f, 0.0f, 0.0f));
+
   std::vector<glm::vec3> extrPontos;
   extrPontos.emplace_back(glm::vec3(-1.0f, 2.0f, 0.0f));
   extrPontos.emplace_back(glm::vec3(1.0f, 1.0f, 0.0f));
   extrPontos.emplace_back(glm::vec3(1.0f, -1.0f, 0.0f));
   extrPontos.emplace_back(glm::vec3(-1.0f, -1.0f, 0.0f));
+
   std::vector<glm::vec3> conePontos;
   conePontos.emplace_back(1.0f, 0.0f, -1.0f);
   conePontos.emplace_back(0.0f, 0.0f, 0.0f);
+
   CGRARevolution track(revoPontos);
   CGRAExtrusion trophy(extrPontos);
   CGRARevolution cone2(conePontos);
+
   track.setShader(basicShader);
   trophy.setShader(basicShader);
   cone.setShader(basicShader);
@@ -201,7 +215,8 @@ int main(int argc, char const *argv[]) {
   pneu.setShader(basicShader);
   sol.setShader(basicShader);
   chao.setShader(basicShader);
-  cubo.setShader(basicShader);
+  carroCorpo.setShader(basicShader);
+
   glm::mat4 chaoPosition(1.0f);
   glm::mat4 trackPosition(1.0f);
   glm::mat4 solPosition(1.0f);
@@ -209,21 +224,38 @@ int main(int argc, char const *argv[]) {
   glm::mat4 conePosition(1.0f);
   glm::mat4 cone2Position(1.0f);
   glm::mat4 trophyPosition(1.0f);
+  glm::mat4 carroCorpoPosition(1.0f);
+  glm::mat4 carroPneuObjLocation(1.0f);
+
   // model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f,
   // 0.0f));
   chaoPosition = glm::scale(chaoPosition, glm::vec3(100.0f, 100.0f, 100.0f));
   chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
                              glm::vec3(1.0f, 0.0f, 0.0f));
-  solPosition =
-      glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
 
-  glm::mat4 cuboPosition =
-      glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+  solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
 
-  
+/*  carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f, 0.6f, 0.8f));
+//  carroCorpoPosition = glm::rotate(carroCorpoPosition, glm::degrees(10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(2.5f, 1.5f, 0.0f));*/
+
+  //carroPneuObjLocation = glm::rotate(carroPneuObjLocation, glm::degrees(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+  carroPneuObjLocation = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
+  carroPneuObjLocation = glm::translate(carroPneuObjLocation, glm::vec3(0.4f, -0.4f, -0.4f));
+  carroPneuObj.TransformFromMother = carroPneuObjLocation;
+  carroPneuObj.Object->setModelTransformation(carroPneuObjLocation);
+  //carroObj.PushChild(&carroPneuObj);
+
+  /*  carroPneuObj.TransformFromMother = carroPneuLocation;
+  carro.PushChild(&carroPneuObj);*/
+
+  /*glm::mat4 cuboPosition =
+      glm::translate(glm::mat4(1.0f), glm::vec3(4.5f, 1.0f, 0.0f));*/
+
   std::vector<glm::vec3> pneuLocations = {glm::vec3(0.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 1.0f, 0.0f)};
+
   pneuPosition = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
   pneuPosition = glm::translate(pneuPosition, glm::vec3(-1.0f, 1.5f, 0.0f));
 
@@ -232,21 +264,21 @@ int main(int argc, char const *argv[]) {
 
   cone2Position = glm::scale(cone2Position, glm::vec3(0.3f, 0.7f, 0.3f));
   cone2Position = glm::translate(cone2Position, glm::vec3(-5.0f, 0.7f, 0.0f));
-  cone2Position = glm::rotate(cone2Position, glm::degrees(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
+  cone2Position = glm::rotate(cone2Position, glm::degrees(90.0f),
+                              glm::vec3(1.0f, 0.0f, 0.0f));
 
   /*glm::mat4 trackPosition =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.0f, 0.0f));*/
-  trackPosition = glm::scale(trackPosition, glm::vec3(5.0f, 5.0f, 5.0f));
-  trackPosition = glm::translate(trackPosition, glm::vec3(0.0f, 0.0f, -0.2f));
   trackPosition = glm::rotate(trackPosition, glm::degrees(90.0f),
                               glm::vec3(1.0f, 0.0f, 0.0f));
+  trackPosition = glm::translate(trackPosition, glm::vec3(0.0f, 0.0f, 0.2f));
+  trackPosition = glm::scale(trackPosition, glm::vec3(5.0f, 5.0f, 5.0f));
 
-  
   trophyPosition = glm::translate(trophyPosition, glm::vec3(0.0f, 1.0f, -1.5f));
   /*glm::mat4 trophyPosition =
       glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 0.0f));*/
-  cubo.setModelTransformation(cuboPosition);
+
+  carroCorpo.setModelTransformation(carroCorpoPosition);
   chao.setModelTransformation(chaoPosition);
   sol.setModelTransformation(solPosition);
   pneu.setModelTransformation(pneuPosition);
@@ -261,8 +293,12 @@ int main(int argc, char const *argv[]) {
   glm::vec4 pneuColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
   glm::vec4 solColor = glm::vec4(0.98f, 0.99f, 0.06f, 1.0f);
   glm::vec4 coneColor = glm::vec4(1.0f, 0.49f, 0.0f, 1.0f);
+  glm::vec4 carroColor = glm::vec4(0.9f, 0.3f, 0.2f, 1.0f);
+
   int color_location =
       glGetUniformLocation(basicShader->shaderprogram, "u_Colors");
+
+  float carroTheta = 0.0f;
 
   while (!glfwWindowShouldClose(window)) {
     float currentFrame = glfwGetTime();
@@ -270,18 +306,22 @@ int main(int argc, char const *argv[]) {
     lastFrame = currentFrame;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Definir cor do chao a verde
+
     glUniform4f(color_location, grassColor[0], grassColor[1], grassColor[2],
                 grassColor[3]);
     // Desenhar chao
     chao.drawIt(camera.GetViewMatrix(), proj);
+
     // Desenhar pista
     glUniform4f(color_location, trackColor[0], trackColor[1], trackColor[2],
                 trackColor[3]);
     track.drawIt(camera.GetViewMatrix(), proj);
+
     // Desenhar trofeu
     glUniform4f(color_location, trophyColor[0], trophyColor[1], trophyColor[2],
                 trophyColor[3]);
     trophy.drawIt(camera.GetViewMatrix(), proj);
+
     // Desenhar pneus
     glUniform4f(color_location, pneuColor[0], pneuColor[1], pneuColor[2],
                 pneuColor[3]);
@@ -297,12 +337,23 @@ int main(int argc, char const *argv[]) {
                 solColor[3]);
     sol.drawIt(camera.GetViewMatrix(), proj);
 
-    // Desenhar cone*/
+    // Desenhar cone
     glUniform4f(color_location, coneColor[0], coneColor[1], coneColor[2],
                 coneColor[3]);
     cone.drawIt(camera.GetViewMatrix(), proj);
     // Desenhar cone (revolucao)
     cone2.drawIt(camera.GetViewMatrix(), proj);
+
+    // Desenhar carro
+    glUniform4f(color_location, carroColor[0], carroColor[1], carroColor[2],
+                carroColor[3]);
+    carroCorpoPosition = glm::mat4(1.0f);
+    carroCorpoPosition = glm::rotate(carroCorpoPosition, glm::degrees(carroTheta), glm::vec3(0.0f, 1.0f, -0.2f));
+    carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
+//    carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f, 0.6f, 0.8f));
+    carroCorpo.setModelTransformation(carroCorpoPosition);
+
+    carroObj.DrawTree(camera.GetViewMatrix(), proj);
 
     //    pneu.drawIt(camera.GetViewMatrix(), proj);
     /*cubo.drawIt(camera.GetViewMatrix(), proj);
@@ -310,6 +361,7 @@ int main(int argc, char const *argv[]) {
     // cone.drawIt(camera.GetViewMatrix(), proj);
     glfwSwapBuffers(window);
     glfwPollEvents();
+    carroTheta += deltaTime * 0.02f;
   }
 
   glfwTerminate();

@@ -6,8 +6,18 @@ compoundObjects::compoundObjects(CGRAobject &CGRAobject) {
       glm::mat4(1.0f); // Set initial transform to identity matrix
 }
 
-void compoundObjects::PushChild(CGRAobject *Child) {
+compoundObjects::~compoundObjects() {}
+
+void compoundObjects::PushChild(compoundObjects *Child) {
 	Children.push_back(Child);
 }
 
-compoundObjects::~compoundObjects() {}
+void compoundObjects::DrawTree(glm::mat4 V, glm::mat4 P) {
+	for(const auto & elemt : Children){
+		glm::mat4 aux(1.0f);
+		aux = TransformFromMother * elemt->Object->modeltr;
+		elemt->Object->setModelTransformation(aux);
+		elemt->Object->drawIt(V, P);
+	}
+	Object->drawIt(V, P);
+}
