@@ -60,11 +60,19 @@ public:
   virtual void drawIt(glm::mat4 V, glm::mat4 P);
 };
 
+
+class CGRAExtrusion : public CGRAobject{
+public:
+  CGRAExtrusion(std::vector<glm::vec3> pontos);
+  ~CGRAExtrusion();
+  void drawIt(glm::mat4 V, glm::mat4 P) override;
+};
+
+
 class CGRARevolution : public CGRAobject{
 public:
   CGRARevolution(std::vector<glm::vec3> pontos);
   ~CGRARevolution();
-  void setModelTransformation(glm::mat4 &modeltransf);
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
 
@@ -73,8 +81,6 @@ public:
   
   CGRASquare();
   ~CGRASquare();
-  void setModelTransformation(glm::mat4 &modeltransf);
-
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
 
@@ -83,8 +89,6 @@ public:
   
   CGRACube();
   ~CGRACube();
-  void setModelTransformation(glm::mat4 &modeltransf);
-
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
 
@@ -92,7 +96,6 @@ class CGRASphere: public CGRAobject{
 public:
   CGRASphere();
   ~CGRASphere();
-  void setModelTransformation(glm::mat4 &modeltransf);
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
 
@@ -100,7 +103,6 @@ class CGRACylinder: public CGRAobject{
 public:
   CGRACylinder();
   ~CGRACylinder();
-  void setModelTransformation(glm::mat4 &modeltransf);
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
 
@@ -108,6 +110,5 @@ class CGRACone: public CGRAobject{
 public:
   CGRACone();
   ~CGRACone();
-  void setModelTransformation(glm::mat4 &modeltransf);
   void drawIt(glm::mat4 V, glm::mat4 P) override;
 };
