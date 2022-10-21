@@ -22,8 +22,9 @@ public:
 
 	compoundObjects(CGRAobject& CGRAobject);
 	~compoundObjects();
-	void PushChild(compoundObjects * Child);
-	void DrawTree(glm::mat4 V, glm::mat4 P);
+	void PushChild(compoundObjects * Child, glm::mat4 connection);
+	void DrawTree(glm::mat4 V, glm::mat4 P, glm::mat4 previousModel);
+	void SetTreeTransformation(glm::mat4 & Transformation);
 	CGRAobject *Object;
 	glm::mat4 TransformFromMother;
 	std::vector<compoundObjects *> Children;

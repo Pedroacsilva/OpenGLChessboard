@@ -23,6 +23,19 @@
 #define IB
 #endif
 
+
+// Classe para print mat4
+
+void PrintMat4(glm::mat4 Matrix){
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < 4; j++){
+      std::cout << Matrix[j][i] << "\t";
+    }
+    std::cout << "\n";
+  }
+}
+
+
 // Classe base
 CGRAobject::CGRAobject() { modeltr = glm::mat4(1.0); }
 
@@ -37,6 +50,63 @@ void CGRAobject::setShader(DEECShader *shaderprog) {
 }
 
 void CGRAobject::drawIt(glm::mat4 V, glm::mat4 P) {}
+
+/*--------------------------+
+|         Compostos         |
++---------------------------*/
+
+CGRACompound::CGRACompound(CGRAobject &Base) {
+  Object = &Base;
+  TransformFromMother =
+      glm::mat4(1.0f); // Referencial da base é o referencial inicial do objecto
+}
+
+CGRACompound::~CGRACompound() {}
+
+void CGRACompound::PushChild(CGRACompound *Child, glm::mat4 connection) {
+  std::cout << "Matriz Child->TransformFromMother pré-push:\n";
+  PrintMat4(Child->TransformFromMother);
+  Child->SetTransformFromMother(connection);
+  std::cout << "Matriz Child->TransformFromMother pós-push:\n";
+  PrintMat4(Child->TransformFromMother);
+/*  glm::mat4 newModelTr(1.0f);
+  newModelTr = connection * modeltr;
+  std::cout << "Matrix Child->modelTr pré set:\n";
+  PrintMat4(Child->modeltr);
+  Child->setModelTransformation(newModelTr);  
+  std::cout << "Matrix Child->modelTr pós set:\n";
+  PrintMat4(Child->modeltr);*/
+  Children.push_back(Child);
+}
+
+void CGRACompound::DrawTree(glm::mat4 V, glm::mat4 P) {
+//  std::cout << "Modeltr:\n";
+//  PrintMat4(Child->modeltr);
+  glm::mat4 newModelTr(1.0f), oldModelTr(1.0f);
+  newModelTr = TransformFromMother * Object->modeltr;
+  PrintMat4(newModelTr);
+  oldModelTr = Object->modeltr;
+  Object->setModelTransformation(newModelTr);
+  Object->drawIt(V, P);
+  Object->setModelTransformation(oldModelTr);
+  for (const auto &elemt : Children) {
+    std::cout << "Modeltr:\n";
+    PrintMat4(elemt->modeltr);
+    elemt->DrawTree(V, P);
+  }
+}
+
+void CGRACompound::SetTransformFromMother(glm::mat4 &modeltransf) {
+  TransformFromMother = modeltransf;
+  modeltr = TransformFromMother * modeltr;
+}
+
+void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
+  Object->modeltr = modeltransf * Object->modeltr;
+  for(const auto & elemt: Children){
+    elemt->Object->modeltr = modeltransf * elemt->Object->modeltr;
+  }
+}
 
 /*--------------------------+
 |         Extrusões         |
@@ -92,7 +162,6 @@ CGRAExtrusion::~CGRAExtrusion() {}
 void CGRAExtrusion::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
-
   glm::mat4 mvp = P * V * modeltr;
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   //  std::cout << "mvp_location: " << mvp_location << "\n";
@@ -316,7 +385,6 @@ CGRACube::~CGRACube()
 void CGRACube::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
-
   glm::mat4 mvp = P * V * modeltr;
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
 //  std::cout << "mvp_location: " << mvp_location << "\n";
@@ -517,6 +585,8 @@ void CGRACylinder::drawIt(glm::mat4 V, glm::mat4 P) {
   m_VA.Bind();
   m_IB.Bind();
 
+  std::cout << "Cilindro Modeltr:\n";
+  PrintMat4(modeltr);
   glm::mat4 mvp = P * V * modeltr;
   int mvp_location = glGetUniformLocation(shader->shaderprogram, "u_MVP");
   //  std::cout << "mvp_location: " << mvp_location << "\n";
@@ -630,3 +700,5 @@ void CGRACone::drawIt(glm::mat4 V, glm::mat4 P) {
   glUniformMatrix4fv(mvp_location, 1, GL_FALSE, &mvp[0][0]);
   glDrawElements(GL_TRIANGLES, m_IB.GetCount(), GL_UNSIGNED_INT, nullptr);
 }
+
+

@@ -1,6 +1,6 @@
 #include "Camera.cpp"
-#include "compoundObjects.cpp"
-#include "compoundObjects.hpp"
+/*#include "compoundObjects.cpp"
+#include "compoundObjects.hpp"*/
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/glm.hpp"
@@ -184,11 +184,10 @@ int main(int argc, char const *argv[]) {
   CGRACylinder pneu;
   CGRACylinder carroPneu;
   CGRACone cone;
-  compoundObjects carroObj(carroCorpo);
-  compoundObjects carroPneuObj(pneu);
-  
-  
+  CGRACompound carroCorpoObj(carroCorpo);
+  CGRACompound carroPneuObj(carroPneu);
 
+  
 
   std::vector<glm::vec3> revoPontos;
   revoPontos.emplace_back(glm::vec3(1.0f, 0.0f, 0.0f));
@@ -216,6 +215,8 @@ int main(int argc, char const *argv[]) {
   sol.setShader(basicShader);
   chao.setShader(basicShader);
   carroCorpo.setShader(basicShader);
+  carroPneu.setShader(basicShader);
+
 
   glm::mat4 chaoPosition(1.0f);
   glm::mat4 trackPosition(1.0f);
@@ -225,32 +226,20 @@ int main(int argc, char const *argv[]) {
   glm::mat4 cone2Position(1.0f);
   glm::mat4 trophyPosition(1.0f);
   glm::mat4 carroCorpoPosition(1.0f);
-  glm::mat4 carroPneuObjLocation(1.0f);
+  glm::mat4 carroPneuPosition(1.0f);
 
   // model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f,
   // 0.0f));
   chaoPosition = glm::scale(chaoPosition, glm::vec3(100.0f, 100.0f, 100.0f));
   chaoPosition = glm::rotate(chaoPosition, glm::degrees(90.0f),
                              glm::vec3(1.0f, 0.0f, 0.0f));
+  chaoPosition = glm::translate(chaoPosition, glm::vec3(0.0f, 0.0f, -0.001f));
+
+
 
   solPosition = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 8.0f, -5.0f));
 
-/*  carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f, 0.6f, 0.8f));
-//  carroCorpoPosition = glm::rotate(carroCorpoPosition, glm::degrees(10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(2.5f, 1.5f, 0.0f));*/
 
-  //carroPneuObjLocation = glm::rotate(carroPneuObjLocation, glm::degrees(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-  carroPneuObjLocation = glm::scale(pneuPosition, glm::vec3(0.6f, 0.1f, 0.2f));
-  carroPneuObjLocation = glm::translate(carroPneuObjLocation, glm::vec3(0.4f, -0.4f, -0.4f));
-  carroPneuObj.TransformFromMother = carroPneuObjLocation;
-  carroPneuObj.Object->setModelTransformation(carroPneuObjLocation);
-  //carroObj.PushChild(&carroPneuObj);
-
-  /*  carroPneuObj.TransformFromMother = carroPneuLocation;
-  carro.PushChild(&carroPneuObj);*/
-
-  /*glm::mat4 cuboPosition =
-      glm::translate(glm::mat4(1.0f), glm::vec3(4.5f, 1.0f, 0.0f));*/
 
   std::vector<glm::vec3> pneuLocations = {glm::vec3(0.0f, 0.0f, 0.0f),
                                           glm::vec3(1.0f, 0.0f, 0.0f),
@@ -269,16 +258,23 @@ int main(int argc, char const *argv[]) {
 
   /*glm::mat4 trackPosition =
       glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 3.0f, 0.0f));*/
+  trackPosition = glm::translate(trackPosition, glm::vec3(0.0f, 0.2f, 0.0f));
   trackPosition = glm::rotate(trackPosition, glm::degrees(90.0f),
                               glm::vec3(1.0f, 0.0f, 0.0f));
-  trackPosition = glm::translate(trackPosition, glm::vec3(0.0f, 0.0f, 0.2f));
   trackPosition = glm::scale(trackPosition, glm::vec3(5.0f, 5.0f, 5.0f));
 
   trophyPosition = glm::translate(trophyPosition, glm::vec3(0.0f, 1.0f, -1.5f));
   /*glm::mat4 trophyPosition =
       glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 0.0f));*/
 
-  carroCorpo.setModelTransformation(carroCorpoPosition);
+  carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
+  glm::mat4 pneu2corpo(1.0f);
+
+  pneu2corpo = glm::translate(pneu2corpo, glm::vec3(0.0f, -0.5f, 0.0f));
+  pneu2corpo = glm::rotate(pneu2corpo, glm::degrees(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+  carroCorpoObj.PushChild(&carroPneuObj, pneu2corpo);
+
+
   chao.setModelTransformation(chaoPosition);
   sol.setModelTransformation(solPosition);
   pneu.setModelTransformation(pneuPosition);
@@ -286,6 +282,9 @@ int main(int argc, char const *argv[]) {
   cone2.setModelTransformation(cone2Position);
   track.setModelTransformation(trackPosition);
   trophy.setModelTransformation(trophyPosition);
+  carroCorpoObj.PropagateModelTransformation(carroCorpoPosition);
+//  carroCorpo.setModelTransformation(carroCorpoPosition);
+//  carroPneuObj.setModelTransformation(pneu2corpo);
 
   glm::vec4 grassColor = glm::vec4(0.3f, 0.5f, 0.27f, 1.0f);
   glm::vec4 trackColor = glm::vec4(0.8f);
@@ -306,7 +305,6 @@ int main(int argc, char const *argv[]) {
     lastFrame = currentFrame;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Definir cor do chao a verde
-
     glUniform4f(color_location, grassColor[0], grassColor[1], grassColor[2],
                 grassColor[3]);
     // Desenhar chao
@@ -347,13 +345,19 @@ int main(int argc, char const *argv[]) {
     // Desenhar carro
     glUniform4f(color_location, carroColor[0], carroColor[1], carroColor[2],
                 carroColor[3]);
-    carroCorpoPosition = glm::mat4(1.0f);
-    carroCorpoPosition = glm::rotate(carroCorpoPosition, glm::degrees(carroTheta), glm::vec3(0.0f, 1.0f, -0.2f));
-    carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
-//    carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f, 0.6f, 0.8f));
-    carroCorpo.setModelTransformation(carroCorpoPosition);
+//    carroCorpoObj.SetTreeTransformation(carroCorpoPosition);
+    glm::mat4 aux(1.0f);
+    aux = glm::rotate(aux, glm::degrees(0.0001f), glm::vec3(0.0f, 1.0f, 0.0f));
+    carroCorpoObj.PropagateModelTransformation(aux);
+    carroCorpoObj.DrawTree(camera.GetViewMatrix(), proj);
 
-    carroObj.DrawTree(camera.GetViewMatrix(), proj);
+//    carroCorpoPosition = glm::rotate(carroCorpoPosition, glm::degrees(carroTheta), glm::vec3(0.0f, 1.0f, 0.0f));
+    
+//    carroCorpoPosition = glm::scale(carroCorpoPosition, glm::vec3(0.8f, 0.6f, 0.8f));
+
+//    carroCorpoObj.DrawTree(camera.GetViewMatrix(), proj);
+
+//    carroPneu.drawIt(camera.GetViewMatrix(), proj);
 
     //    pneu.drawIt(camera.GetViewMatrix(), proj);
     /*cubo.drawIt(camera.GetViewMatrix(), proj);

@@ -36,6 +36,8 @@
 #define IB
 #endif
 
+void PrintMat4(glm::mat4 Matrix);
+
 class CGRAobject {
 public:
   glm::mat4 modeltr;
@@ -58,6 +60,21 @@ public:
 
   void AddIndexBuffer(const void *data, unsigned int count);
   virtual void drawIt(glm::mat4 V, glm::mat4 P);
+};
+
+class CGRACompound : public CGRAobject{
+public:
+  CGRACompound(CGRAobject &Base);
+  ~CGRACompound();
+  void DrawTree(glm::mat4 V, glm::mat4 P);
+  void PushChild(CGRACompound * Child, glm::mat4 connection);
+  void setModelTransformation(glm::mat4 &modeltransf) = delete;
+  void SetTransformFromMother(glm::mat4 &modeltransf);
+  void PropagateModelTransformation(glm::mat4 &modeltransf);
+
+  CGRAobject * Object;
+  glm::mat4 TransformFromMother;
+  std::vector<CGRACompound *> Children;
 };
 
 
