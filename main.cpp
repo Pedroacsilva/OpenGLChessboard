@@ -267,10 +267,12 @@ int main(int argc, char const *argv[]) {
   /*glm::mat4 trophyPosition =
       glm::translate(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 0.0f));*/
 
-  carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(5.0f, 1.0f, 0.0f));
+  carroCorpoPosition = glm::translate(carroCorpoPosition, glm::vec3(5.0f, 0.0f, 0.0f));
   glm::mat4 pneu2corpo(1.0f);
 
-  pneu2corpo = glm::translate(pneu2corpo, glm::vec3(0.0f, -0.5f, 0.0f));
+
+  pneu2corpo = glm::scale(pneu2corpo, glm::vec3(0.5f, 0.5f, 0.5f));
+//  pneu2corpo = glm::translate(pneu2corpo, glm::vec3(0.5f, -0.5f, 0.5f));
   pneu2corpo = glm::rotate(pneu2corpo, glm::degrees(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
   carroCorpoObj.PushChild(&carroPneuObj, pneu2corpo);
 

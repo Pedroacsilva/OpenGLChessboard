@@ -104,7 +104,7 @@ void CGRACompound::SetTransformFromMother(glm::mat4 &modeltransf) {
 void CGRACompound::PropagateModelTransformation(glm::mat4 &modeltransf) {
   Object->modeltr = modeltransf * Object->modeltr;
   for(const auto & elemt: Children){
-    elemt->Object->modeltr = modeltransf * elemt->Object->modeltr;
+    elemt->TransformFromMother = modeltransf * elemt->TransformFromMother;
   }
 }
 
