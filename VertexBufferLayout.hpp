@@ -36,7 +36,7 @@ public:
   const std::vector<VertexBufferElement> GetElements() const {
     return m_Elements;
   }
-  inline unsigned int GetStride() const { return m_Stride; }
+  unsigned int GetStride() const { return m_Stride; }
 
   template <typename T> void Push(unsigned int count, std::string string = "") {}
 };
